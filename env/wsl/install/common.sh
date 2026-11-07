@@ -393,13 +393,13 @@ select_theme() {
 
 export UM_ENV_DIR UM_NONINTERACTIVE UM_VERBOSE UM_SHELL UM_THEME UM_ENABLE_K8S UM_MODE UM_COMPONENTS UM_SKIP UM_SKIP_PACKAGES
 
-UM_AI_REPO_HTTPS="${UM_AI_REPO_HTTPS:-https://github.com/Robertcl795/umbra-ai.git}"
-UM_AI_REPO_SSH="${UM_AI_REPO_SSH:-git@github.com:Robertcl795/umbra-ai.git}"
+UM_AI_REPO_HTTPS="${UM_AI_REPO_HTTPS:-https://github.com/robert-rocker/umbra-ai.git}"
+UM_AI_REPO_SSH="${UM_AI_REPO_SSH:-git@github.com:robert-rocker/umbra-ai.git}"
 
 # The Umbra core (`umbra`, alias `um`) lives in the private monorepo since C1 (ADR 0045, 0048);
 # umbra-ai (the Standard, `um ai`'s tool) is its ai/ project, also mirrored on its own.
-UM_CORE_REPO_HTTPS="${UM_CORE_REPO_HTTPS:-https://github.com/Robertcl795/umbra.git}"
-UM_CORE_REPO_SSH="${UM_CORE_REPO_SSH:-git@github.com:Robertcl795/umbra.git}"
+UM_CORE_REPO_HTTPS="${UM_CORE_REPO_HTTPS:-https://github.com/robert-rocker/umbra.git}"
+UM_CORE_REPO_SSH="${UM_CORE_REPO_SSH:-git@github.com:robert-rocker/umbra.git}"
 UM_CORE_CLONE_DIR="${UM_CORE_CLONE_DIR:-$HOME/.local/share/umbra/umbra}"
 
 # find_umbra_core: prints the monorepo checkout that holds the core: UM_CORE_DIR, then the

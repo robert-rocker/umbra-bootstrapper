@@ -3,10 +3,10 @@ set -euo pipefail
 
 # Bootstrap script for the Umbra WSL environment (env/wsl)
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/Robertcl795/umbra-bootstrapper/main/env/wsl/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/robert-rocker/umbra-bootstrapper/main/env/wsl/bootstrap.sh | bash
 #   OR cloned: env/wsl/bootstrap.sh
 
-UM_REPO="https://github.com/Robertcl795/umbra-bootstrapper.git"
+UM_REPO="https://github.com/robert-rocker/umbra-bootstrapper.git"
 UM_BRANCH="${UM_BRANCH:-main}"
 SOURCE_PATH="${BASH_SOURCE[0]:-${0:-}}"
 if [ -z "$SOURCE_PATH" ]; then

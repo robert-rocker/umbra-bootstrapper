@@ -6,7 +6,21 @@
 # checksums.sha256. A bump changes both (docs/setup-tui/release.md). An empty UM_SETUP_VERSION
 # means no pin, for tests.
 UM_SETUP_VERSION="${UM_SETUP_VERSION-0.5.0}"
-UM_SETUP_REPO_URL="https://github.com/Robertcl795/umbra-bootstrapper"
+UM_SETUP_REPO_URL="https://github.com/robert-rocker/umbra-bootstrapper"
+# Releases signed before the owner was renamed (Robertcl795 → robert-rocker, 2026-11-07) carry the
+# old repo URL in their Sigstore identity and attestation. Downloads use the new URL (GitHub moved the
+# assets); only the identity check of these versions uses the old one. Drop a version from this
+# list once a release signed under the new owner is pinned.
+UM_SETUP_PRE_RENAME_VERSIONS="0.5.0"
+UM_SETUP_PRE_RENAME_URL="https://github.com/Robertcl795/umbra-bootstrapper"
+
+# setup_signer_url <version>: the repo URL the release of <version> was signed under.
+setup_signer_url() {
+  case " $UM_SETUP_PRE_RENAME_VERSIONS " in
+    *" $1 "*) echo "$UM_SETUP_PRE_RENAME_URL" ;;
+    *) echo "$UM_SETUP_REPO_URL" ;;
+  esac
+}
 # shellcheck disable=SC2034  # used by install.sh, which sources this file
 UM_AI_PRIVATE_MSG="Umbra AI is private: log in with \`gh auth login\` or add an SSH key with access, then run the command again."
 
@@ -158,7 +172,7 @@ fetch_setup() {
     return 2
   fi
   setup_check_signature "$base" "$dir" "$asset" "$ver" "$sha" || return 2
-  setup_check_attestation "$dir/$asset" || return 2
+  setup_check_attestation "$dir/$asset" "$ver" || return 2
   tar -xz -C "$dir" -f "$dir/$asset" umbra-setup || { log_error "Unpacking $asset failed."; return 1; }
   echo "$dir/umbra-setup"
 }
@@ -177,7 +191,7 @@ setup_check_signature() {
     return 1
   fi
   if ! cosign verify-blob \
-    --certificate-identity "$UM_SETUP_REPO_URL/.github/workflows/release.yml@refs/tags/v$ver" \
+    --certificate-identity "$(setup_signer_url "$ver")/.github/workflows/release.yml@refs/tags/v$ver" \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com \
     --bundle "$dir/checksums.txt.sigstore.json" "$dir/checksums.txt" >/dev/null 2>&1; then
     log_error "The signature check failed for checksums.txt of umbra-setup v$ver; not running it."
@@ -190,14 +204,16 @@ setup_check_signature() {
   fi
 }
 
-# setup_check_attestation <file>: gh attestation verify against the bootstrapper repo. Skipped
-# (said once) when gh is missing, not logged in, or has no attestation command.
+# setup_check_attestation <file> <version>: gh attestation verify against the repo the release was
+# built in. Skipped (said once) when gh is missing, not logged in, or has no attestation command.
 setup_check_attestation() {
+  local signer
+  signer="$(setup_signer_url "${2:-}")"
   if ! command -v gh >/dev/null 2>&1 || ! gh auth status >/dev/null 2>&1 || ! gh attestation --help >/dev/null 2>&1; then
     log_info "gh not logged in (or too old); the build provenance attestation is not checked."
     return 0
   fi
-  if ! gh attestation verify "$1" -R "${UM_SETUP_REPO_URL#https://github.com/}" >/dev/null 2>&1; then
+  if ! gh attestation verify "$1" -R "${signer#https://github.com/}" >/dev/null 2>&1; then
     log_error "The attestation check failed for $(basename "$1"); not running it."
     return 1
   fi

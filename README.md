@@ -11,13 +11,13 @@ One command sets up a themed developer environment: packages, zsh, Starship, Neo
 Every platform uses the same command. It follows the `main` branch.
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/Robertcl795/umbra-bootstrapper/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/robert-rocker/umbra-bootstrapper/main/install.sh | bash
 ```
 
 To read the script before you run it:
 
 ```sh
-curl -fsSL -o install.sh https://raw.githubusercontent.com/Robertcl795/umbra-bootstrapper/main/install.sh
+curl -fsSL -o install.sh https://raw.githubusercontent.com/robert-rocker/umbra-bootstrapper/main/install.sh
 less install.sh && bash install.sh
 ```
 
@@ -74,14 +74,14 @@ After a fresh-WSL stage 1, the checkout is `~/dev/umbra-bootstrapper` instead. W
 
 ```sh
 v=X.Y.Z
-base=https://github.com/Robertcl795/umbra-bootstrapper/releases/download/v$v
+base=https://github.com/robert-rocker/umbra-bootstrapper/releases/download/v$v
 curl -fsSLO "$base/checksums.txt" -O "$base/checksums.txt.sigstore.json" -O "$base/umbra-setup_${v}_linux_amd64.tar.gz"
 cosign verify-blob \
-  --certificate-identity "https://github.com/Robertcl795/umbra-bootstrapper/.github/workflows/release.yml@refs/tags/v$v" \
+  --certificate-identity "https://github.com/robert-rocker/umbra-bootstrapper/.github/workflows/release.yml@refs/tags/v$v" \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
   --bundle checksums.txt.sigstore.json checksums.txt
 sha256sum --check --ignore-missing checksums.txt
-gh attestation verify "umbra-setup_${v}_linux_amd64.tar.gz" -R Robertcl795/umbra-bootstrapper
+gh attestation verify "umbra-setup_${v}_linux_amd64.tar.gz" -R robert-rocker/umbra-bootstrapper
 ```
 
 Every release also carries SBOMs of the archives and the source.

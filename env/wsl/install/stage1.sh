@@ -17,7 +17,7 @@ source "$SCRIPT_DIR/common.sh"
 source "$SCRIPT_DIR/wsl_detect.sh"
 
 BOOT_ROOT="$(cd -- "$UM_ENV_DIR/../.." && pwd)"
-UM_BOOTSTRAPPER_REPO="${UM_BOOTSTRAPPER_REPO:-https://github.com/Robertcl795/umbra-bootstrapper.git}"
+UM_BOOTSTRAPPER_REPO="${UM_BOOTSTRAPPER_REPO:-https://github.com/robert-rocker/umbra-bootstrapper.git}"
 UM_BRANCH="${UM_BRANCH:-main}"
 UM_COMPLETE_FILE=/var/lib/umbra/bootstrap-complete
 UM_REMINDER=/etc/profile.d/umbra-bootstrap.sh

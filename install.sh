@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # install.sh — the single Umbra command (ADR 0014, 0016–0018).
 #
-#   curl -fsSL https://raw.githubusercontent.com/Robertcl795/umbra-bootstrapper/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/robert-rocker/umbra-bootstrapper/main/install.sh | bash
 #
 # Detects the platform (WSL Ubuntu/Arch, native Ubuntu/Arch, Omarchy) and, in a terminal, opens
 # umbra-setup, the TUI (pinned and verified, ADR 0038); the selection goes to env/wsl/bootstrap.sh.
@@ -10,9 +10,9 @@
 # the selection and changes nothing. Other flags (--user, --shell, --theme, …) go to bootstrap.sh.
 set -euo pipefail
 
-UM_BOOTSTRAPPER_REPO="${UM_BOOTSTRAPPER_REPO:-https://github.com/Robertcl795/umbra-bootstrapper.git}"
+UM_BOOTSTRAPPER_REPO="${UM_BOOTSTRAPPER_REPO:-https://github.com/robert-rocker/umbra-bootstrapper.git}"
 UM_BRANCH="${UM_BRANCH:-main}"
-UM_THEME_REPO="${UM_THEME_REPO:-https://github.com/Robertcl795/omarchy-umbra-theme.git}"
+UM_THEME_REPO="${UM_THEME_REPO:-https://github.com/robert-rocker/omarchy-umbra-theme.git}"
 
 # run_priv: copy of the helper in env/wsl/install/common.sh (ADR 0021); nothing else is here yet.
 run_priv() {

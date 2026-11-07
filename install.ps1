@@ -1,6 +1,6 @@
 # Umbra Setup for Windows (ADR 0042): one command from PowerShell to a ready WSL distro.
 #
-#   irm https://raw.githubusercontent.com/Robertcl795/umbra-bootstrapper/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/robert-rocker/umbra-bootstrapper/main/install.ps1 | iex
 #
 # A thin driver: every install step is install.sh inside the distro. This script only calls
 # wsl.exe:
@@ -21,7 +21,7 @@
 # This file stays ASCII: Windows PowerShell 5.1 reads a BOM-less file as ANSI.
 
 $UmRestartCode = 10
-$UmInstallSh = 'https://raw.githubusercontent.com/Robertcl795/umbra-bootstrapper/main/install.sh'
+$UmInstallSh = 'https://raw.githubusercontent.com/robert-rocker/umbra-bootstrapper/main/install.sh'
 $UmOnline = @(
   @{ Name = 'archlinux'; Label = 'Arch Linux' },
   @{ Name = 'Ubuntu-24.04'; Label = 'Ubuntu 24.04 LTS' }

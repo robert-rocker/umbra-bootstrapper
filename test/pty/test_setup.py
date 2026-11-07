@@ -199,7 +199,7 @@ def fake_release(tmp, ver="9.9.9"):
     sha = subprocess.run(["sha256sum", os.path.join(rel, asset)], capture_output=True, text=True).stdout.split()[0]
     pins = os.path.join(tmp, "checksums.sha256")
     with open(pins, "w") as f:
-        f.write(f"{sha}  https://github.com/Robertcl795/umbra-bootstrapper/releases/download/v{ver}/{asset}\n")
+        f.write(f"{sha}  https://github.com/robert-rocker/umbra-bootstrapper/releases/download/v{ver}/{asset}\n")
     return rel, pins
 
 

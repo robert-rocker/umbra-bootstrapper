@@ -6,7 +6,7 @@ On [Omarchy](https://learn.omacom.io), Omarchy owns its defaults. Umbra adds a t
 
 | Piece | How |
 |---|---|
-| The Umbra theme | `omarchy theme install https://github.com/Robertcl795/omarchy-umbra-theme.git`; a bundled copy plus `omarchy theme set umbra` when the repo is unreachable |
+| The Umbra theme | `omarchy theme install https://github.com/robert-rocker/omarchy-umbra-theme.git`; a bundled copy plus `omarchy theme set umbra` when the repo is unreachable |
 | zsh and Starship | chezmoi deploys only `~/.zshrc`, `~/.config/zsh/` and `~/.config/starship.toml` |
 | Missing CLI tools | `pacman -S --needed` for what Omarchy lacks; never `pacman -Syu` |
 

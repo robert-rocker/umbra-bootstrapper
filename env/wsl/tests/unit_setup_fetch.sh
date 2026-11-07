@@ -20,7 +20,7 @@ trap 'rm -rf "$t"' EXIT
 ver=9.9.9
 case "$(uname -m)" in aarch64 | arm64) arch=arm64 ;; *) arch=amd64 ;; esac
 asset="umbra-setup_${ver}_linux_${arch}.tar.gz"
-canon="https://github.com/Robertcl795/umbra-bootstrapper/releases/download/v$ver/$asset"
+canon="https://github.com/robert-rocker/umbra-bootstrapper/releases/download/v$ver/$asset"
 
 # The fake release: the archive as GoReleaser names it, checksums.txt and a bundle.
 mkdir -p "$t/rel" "$t/env/install" "$t/bin" "$t/home"
@@ -55,7 +55,7 @@ fetch() {
 echo "# pinning"
 out="$(env -i PATH="$TOOLS" HOME="$t/home" bash -c 'source "'"$ENV_DIR"'/install/common.sh"; source "'"$ENV_DIR"'/install/selector.sh"; echo "$UM_SETUP_VERSION"')"
 expect "the default pin is 0.5.0" '[ "$out" = 0.5.0 ]'
-expect "both 0.5.0 archives have a sha256 line" '(for a in amd64 arm64; do grep -Eq "^[0-9a-f]{64}  https://github.com/Robertcl795/umbra-bootstrapper/releases/download/v0.5.0/umbra-setup_0.5.0_linux_$a.tar.gz\$" "$ENV_DIR/install/checksums.sha256" || exit 1; done)'
+expect "both 0.5.0 archives have a sha256 line" '(for a in amd64 arm64; do grep -Eq "^[0-9a-f]{64}  https://github.com/robert-rocker/umbra-bootstrapper/releases/download/v0.5.0/umbra-setup_0.5.0_linux_$a.tar.gz\$" "$ENV_DIR/install/checksums.sha256" || exit 1; done)'
 out="$(fetch UM_SETUP_VERSION=)"
 expect "no pinned version: not available (1), said once" '[[ $out == *"no pinned release"* && $out == *rc=1* && $out != *gum* ]]'
 out="$(fetch UM_SETUP_VERSION=1.0.0)"
@@ -81,7 +81,7 @@ chmod +x "$t/bin/cosign"
 out="$(fetch UM_SETUP_VERSION=$ver)"
 expect "cosign ok: the path" '[[ $out == *path=* ]]'
 expect "cosign verify-blob pins the release workflow at the tag and the GitHub issuer" \
-  'grep -q -- "verify-blob --certificate-identity https://github.com/Robertcl795/umbra-bootstrapper/.github/workflows/release.yml@refs/tags/v$ver --certificate-oidc-issuer https://token.actions.githubusercontent.com --bundle" "$t/cosign.args"'
+  'grep -q -- "verify-blob --certificate-identity https://github.com/robert-rocker/umbra-bootstrapper/.github/workflows/release.yml@refs/tags/v$ver --certificate-oidc-issuer https://token.actions.githubusercontent.com --bundle" "$t/cosign.args"'
 out="$(fetch UM_SETUP_VERSION=$ver FAKE_COSIGN_RC=1)"
 expect "cosign fails: stop (2)" '[[ $out == *"signature check failed"* && $out == *rc=2* ]]'
 printf '%s  %s\n' "0000000000000000000000000000000000000000000000000000000000000000" "$asset" >"$t/rel/checksums.txt"
@@ -102,7 +102,7 @@ exit 1
 EOF
 chmod +x "$t/bin/gh"
 out="$(fetch UM_SETUP_VERSION=$ver)"
-expect "gh ok: the path, verified against the bootstrapper repo" '[[ $out == *path=* ]] && grep -q -- "-R Robertcl795/umbra-bootstrapper" "$t/gh.args"'
+expect "gh ok: the path, verified against the bootstrapper repo" '[[ $out == *path=* ]] && grep -q -- "-R robert-rocker/umbra-bootstrapper" "$t/gh.args"'
 out="$(fetch UM_SETUP_VERSION=$ver FAKE_GH_RC=1)"
 expect "attestation fails: stop (2)" '[[ $out == *"attestation check failed"* && $out == *rc=2* ]]'
 rm "$t/bin/gh"
@@ -119,6 +119,13 @@ printf '#!/bin/sh\necho someone else\n' >"$t/home/.local/bin/umbra-setup"
 out="$(inst "$t/build/umbra-setup")"
 expect "a foreign umbra-setup is kept; the verified copy runs from the temp dir" \
   '[[ $out == *"not overwritten"* ]] && [[ $(tail -n 1 <<<"$out") == "$t/build/umbra-setup" ]] && grep -q "someone else" "$t/home/.local/bin/umbra-setup"'
+
+# The owner rename (2026-11-07): releases signed before it are checked against the old repo URL,
+# later ones against the new one; downloads always use the new URL.
+signer() { (source "$ENV_DIR/install/common.sh" >/dev/null 2>&1; source "$ENV_DIR/install/selector.sh" >/dev/null 2>&1; setup_signer_url "$1"); }
+expect "0.5.0 was signed under the old owner" '[ "$(signer 0.5.0)" = https://github.com/Robertcl795/umbra-bootstrapper ]'
+expect "a later release is signed under the new owner" '[ "$(signer 0.6.0)" = https://github.com/robert-rocker/umbra-bootstrapper ]'
+expect "downloads use the new owner's URL" 'grep -q "^UM_SETUP_REPO_URL=\"https://github.com/robert-rocker/umbra-bootstrapper\"" "$ENV_DIR/install/selector.sh"'
 
 echo "unit_setup_fetch: $pass ok, $fails failed"
 [ "$fails" -eq 0 ]
