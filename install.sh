@@ -166,6 +166,10 @@ fi
 
 # Umbra AI selected and not here yet: clone it with the user's own credentials (ADR 0018).
 # As root this waits for stage 2, so the clone lands in the new user's home.
+if [ "$access" = 1 ] && [ "$(id -u)" -ne 0 ] && [[ ",$comps," =~ ,(um|vault), ]] && ! find_umbra_core >/dev/null 2>&1; then
+  log_info "Cloning the Umbra core into $UM_CORE_CLONE_DIR"
+  clone_umbra_core
+fi
 if [ "$access" = 1 ] && [ "$(id -u)" -ne 0 ] && [[ ",$comps," =~ ,(um|vault|ai-standard), ]] && ! find_umbra_ai >/dev/null 2>&1; then
   log_info "Cloning umbra-ai into $UM_AI_CLONE_DIR"
   clone_umbra_ai

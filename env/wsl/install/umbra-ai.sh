@@ -9,17 +9,17 @@ SCRIPT_DIR="$(cd -- "$(dirname "$SOURCE_PATH")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 # Umbra AI (ADR 0018), the parts not covered by the ai-cli and ai-standard phases:
-#   um     the `um` CLI from umbra-ai, linked into ~/.local/bin
+#   um     the Umbra core from the private monorepo: umbra, and its alias um, in ~/.local/bin
 #   vault  clone your private vault (UM_VAULT_REPO, personal profile only) or `um init`
 #   ollama local models runtime; nothing is pulled and no service is started
 # Work profile (ADR 0007): no private vault clone (um init in work mode), Ollama binary only.
 UM_OLLAMA_VERSION="0.40.13"
 
 install_um() {
-  find_umbra_ai >/dev/null 2>&1 || clone_umbra_ai
-  local ai
-  ai="$(find_umbra_ai)" || { log_warn "umbra-ai not found (it is private); skipping um."; return 0; }
-  bash "$ai/cli/install.sh" --no-init
+  find_umbra_core >/dev/null 2>&1 || clone_umbra_core
+  local core
+  core="$(find_umbra_core)" || { log_warn "The Umbra core was not found (it is private); skipping um."; return 0; }
+  bash "$core/scripts/install-umbra.sh" --no-init
 }
 
 setup_vault() {

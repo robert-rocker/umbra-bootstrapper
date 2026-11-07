@@ -396,15 +396,44 @@ export UM_ENV_DIR UM_NONINTERACTIVE UM_VERBOSE UM_SHELL UM_THEME UM_ENABLE_K8S U
 UM_AI_REPO_HTTPS="${UM_AI_REPO_HTTPS:-https://github.com/Robertcl795/umbra-ai.git}"
 UM_AI_REPO_SSH="${UM_AI_REPO_SSH:-git@github.com:Robertcl795/umbra-ai.git}"
 
-# find_umbra_ai: prints the umbra-ai checkout (ADR 0018): UM_AI_DIR, then the umbrella's ai/
-# submodule next to the bootstrapper, then the clone made by the Umbra AI item
+# The Umbra core (`umbra`, alias `um`) lives in the private monorepo since C1 (ADR 0045, 0048);
+# umbra-ai (the Standard, `um ai`'s tool) is its ai/ project, also mirrored on its own.
+UM_CORE_REPO_HTTPS="${UM_CORE_REPO_HTTPS:-https://github.com/Robertcl795/umbra.git}"
+UM_CORE_REPO_SSH="${UM_CORE_REPO_SSH:-git@github.com:Robertcl795/umbra.git}"
+UM_CORE_CLONE_DIR="${UM_CORE_CLONE_DIR:-$HOME/.local/share/umbra/umbra}"
+
+# find_umbra_core: prints the monorepo checkout that holds the core: UM_CORE_DIR, then the
+# monorepo around this bootstrapper, then the clone made by the um item (UM_CORE_CLONE_DIR).
+find_umbra_core() {
+  local base d
+  base="$(cd -- "$UM_ENV_DIR/../.." && pwd)"
+  for d in ${UM_CORE_DIR:+"$UM_CORE_DIR"} "$base/.." "$UM_CORE_CLONE_DIR"; do
+    if [ -f "$d/scripts/install-umbra.sh" ] && [ -d "$d/cmd/umbra" ]; then
+      (cd -- "$d" && pwd)
+      return 0
+    fi
+  done
+  return 1
+}
+
+# clone_umbra_core: clones the monorepo with the user's own credentials (ADR 0018). Never starts
+# a login.
+clone_umbra_core() {
+  mkdir -p "$(dirname "$UM_CORE_CLONE_DIR")"
+  GIT_TERMINAL_PROMPT=0 git clone -q --depth=1 "$UM_CORE_REPO_HTTPS" "$UM_CORE_CLONE_DIR" 2>/dev/null \
+    || GIT_SSH_COMMAND="ssh -o BatchMode=yes" git clone -q --depth=1 "$UM_CORE_REPO_SSH" "$UM_CORE_CLONE_DIR" 2>/dev/null \
+    || log_warn "Could not clone the Umbra core (private); um will be skipped."
+}
+
+# find_umbra_ai: prints the umbra-ai checkout (ADR 0018): UM_AI_DIR, then the monorepo's ai/
+# next to the bootstrapper, then the core clone's ai/, then the clone made by the Umbra AI item
 # (UM_AI_CLONE_DIR). Returns 1 when none exists.
 UM_AI_CLONE_DIR="${UM_AI_CLONE_DIR:-$HOME/.local/share/umbra/umbra-ai}"
 find_umbra_ai() {
   local base d
   base="$(cd -- "$UM_ENV_DIR/../.." && pwd)"
-  for d in ${UM_AI_DIR:+"$UM_AI_DIR"} "$base/../ai" "$UM_AI_CLONE_DIR"; do
-    if [ -d "$d/cli" ] && { [ -d "$d/standard" ] || [ -d "$d/toolkit/ai-standard" ]; }; then
+  for d in ${UM_AI_DIR:+"$UM_AI_DIR"} "$base/../ai" "$UM_CORE_CLONE_DIR/ai" "$UM_AI_CLONE_DIR"; do
+    if [ -f "$d/tools/umbra_ai.py" ] && [ -d "$d/standard" ]; then
       (cd -- "$d" && pwd)
       return 0
     fi
