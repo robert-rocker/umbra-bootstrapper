@@ -125,7 +125,7 @@ Each of these came from a real run on a fresh distro.
 | `scripts/verify.sh` | static checks, unit, Go and PTY tests; no containers |
 | `test/pty/` | PTY tests of umbra-setup, and the real-install gate it runs inside a test distro |
 
-Umbra AI (the `um` CLI, vault, AI standard, AI CLIs, Ollama) appears in the menu when the installer can reach its public repo; `UM_AI_ACCESS=0` hides it. What `um` does for you, and how to use it: [the `um` docs](https://github.com/Robertcl795/umbra-ai/tree/main/docs).
+Umbra AI (the `umbra` CLI and its alias `um`, the vault, the AI standard, AI CLIs, Ollama) appears in the menu only when your own GitHub credentials can read its private repos; `UM_AI_ACCESS=0` hides it. Umbra's core and its docs stay private until v1.
 
 ## License
 
