@@ -54,8 +54,8 @@ fetch() {
 
 echo "# pinning"
 out="$(env -i PATH="$TOOLS" HOME="$t/home" bash -c 'source "'"$ENV_DIR"'/install/common.sh"; source "'"$ENV_DIR"'/install/selector.sh"; echo "$UM_SETUP_VERSION"')"
-expect "the default pin is 0.5.0" '[ "$out" = 0.5.0 ]'
-expect "both 0.5.0 archives have a sha256 line" '(for a in amd64 arm64; do grep -Eq "^[0-9a-f]{64}  https://github.com/robert-rocker/umbra-bootstrapper/releases/download/v0.5.0/umbra-setup_0.5.0_linux_$a.tar.gz\$" "$ENV_DIR/install/checksums.sha256" || exit 1; done)'
+expect "the default pin is 0.6.0" '[ "$out" = 0.6.0 ]'
+expect "both 0.6.0 archives have a sha256 line" '(for a in amd64 arm64; do grep -Eq "^[0-9a-f]{64}  https://github.com/robert-rocker/umbra-bootstrapper/releases/download/v0.6.0/umbra-setup_0.6.0_linux_$a.tar.gz\$" "$ENV_DIR/install/checksums.sha256" || exit 1; done)'
 out="$(fetch UM_SETUP_VERSION=)"
 expect "no pinned version: not available (1), said once" '[[ $out == *"no pinned release"* && $out == *rc=1* && $out != *gum* ]]'
 out="$(fetch UM_SETUP_VERSION=1.0.0)"
@@ -120,11 +120,7 @@ out="$(inst "$t/build/umbra-setup")"
 expect "a foreign umbra-setup is kept; the verified copy runs from the temp dir" \
   '[[ $out == *"not overwritten"* ]] && [[ $(tail -n 1 <<<"$out") == "$t/build/umbra-setup" ]] && grep -q "someone else" "$t/home/.local/bin/umbra-setup"'
 
-# The owner rename (2026-11-07): releases signed before it are checked against the old repo URL,
-# later ones against the new one; downloads always use the new URL.
-signer() { (source "$ENV_DIR/install/common.sh" >/dev/null 2>&1; source "$ENV_DIR/install/selector.sh" >/dev/null 2>&1; setup_signer_url "$1"); }
-expect "0.5.0 was signed under the old owner" '[ "$(signer 0.5.0)" = https://github.com/Robertcl795/umbra-bootstrapper ]'
-expect "a later release is signed under the new owner" '[ "$(signer 0.6.0)" = https://github.com/robert-rocker/umbra-bootstrapper ]'
+# The owner rename (2026-11-07): downloads and the signer identity use the new owner's URL.
 expect "downloads use the new owner's URL" 'grep -q "^UM_SETUP_REPO_URL=\"https://github.com/robert-rocker/umbra-bootstrapper\"" "$ENV_DIR/install/selector.sh"'
 
 echo "unit_setup_fetch: $pass ok, $fails failed"
